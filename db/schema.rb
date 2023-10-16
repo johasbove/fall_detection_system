@@ -26,7 +26,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_16_195836) do
 
   create_table "caregivers", force: :cascade do |t|
     t.string "phone"
-    t.string "reference_code", null: false
     t.bigint "health_center_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -45,6 +44,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_16_195836) do
 
   create_table "health_centers", force: :cascade do |t|
     t.string "name"
+    t.string "reference_code", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

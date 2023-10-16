@@ -38,6 +38,7 @@ For starting the app, please run:
 
 ```
 rails db:create
+rails db:seed
 rails s
 ```
 
