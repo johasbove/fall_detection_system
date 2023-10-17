@@ -17,3 +17,8 @@ ideas:
 - Additional information field in the patient table is of type text to allow more data insertion than usual.
 - Usually addresses need some kind of formating which, between other things, helps making sure we're collecting all the information needed in order to build a proper address.
 - Caregivers' first and last name might be needed in the future to solve situations stated in Level 6.
+- Twilio use: there's a gem called `twilio-ruby` that allows us to connect to our account. For that we would need to set our credentials
+- Alerts' table could be use for saving received but also sent messages, however I decided not to do that because:
+  - Both data points will potentially grow very quickly and having the same table growing at a fast pace from two different sources would be harder to manage.
+  - The two types of messages could need different logic for purging the records (for example, we could decide to delete the received messages after a specific period of time and sent messages after a much shorter period, maybe after it's confirmed as received for example). Then, it's better to have the records in different tables for implementing specific logic.
+- Building the parsing services and its tests took longer than expected.

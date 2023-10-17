@@ -49,3 +49,22 @@ Device.create([
     patient: patient2
   }
 ])
+
+Alert.create([
+  {
+    received_at: Time.now,
+    received_value: 200,
+    alert_type: 2,
+    latitude: 52.359988,
+    longitud: 4.652951,
+    device: Device.first
+  },
+  {
+    received_at: 2.hours.ago,
+    received_value: 500,
+    alert_type: 1,
+    latitude: 52.359965,
+    longitud: 4.639595,
+    device: Device.second
+  }
+])

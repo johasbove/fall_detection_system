@@ -51,7 +51,6 @@ The command `rails db:create` creates a PostgreSQL DB named `fall_detection_syst
 
 
 
-
 ===
 
 * Ruby version
