@@ -1,11 +1,12 @@
 module Alerts
-  class IncomingAlertParser
+  class IncomingAlertBuilder
     def initialize(alert_params)
       @alert_params = alert_params.with_indifferent_access
       @alert = Alert.new
+      @error = ''
     end
 
-    attr_reader :alert_params, :alert
+    attr_reader :alert_params, :alert, :error
 
     def build_alert
       if is_valid?
@@ -17,30 +18,44 @@ module Alerts
           longitud: longitud,
           device: device
         )
-
-        alert.save!
         alert
       else
-        { error: 'invalid data'}
+        { error: error }
       end
     end
 
     private
 
     def is_valid?
-      alert_params[:sim_sid].present? &&
-        alert_params[:content].present? &&
+      sim_sid_present? &&
+      content_present? &&
         device_exists? &&
         is_content_valid?
     end
 
+    def sim_sid_present?
+      return false if alert_params[:sim_sid].blank? && add_error('sim')
+
+      true
+    end
+
+    def content_present?
+      return false if alert_params[:content].blank? && add_error('content')
+
+      true
+    end
+
     def is_content_valid?
       response = ContentValidator.new(content_by_field).validate
-      response[:is_valid]
+      return false if !response[:is_valid] && add_error('content_format')
+
+      true
     end
 
     def device_exists?
-      !device.nil?
+      return false if device.nil? && add_error('device')
+
+      true
     end
 
     def device
@@ -84,6 +99,23 @@ module Alerts
       end
 
       @content_by_field
+    end
+
+    def add_error(error_type)
+      string = case error_type
+      when 'sim'
+        ' Missing SIM sid. '
+      when 'content'
+        ' Missing content data. '
+      when 'content_format'
+        ' Invalid content format. '
+      when 'device'
+        ' Device does not exists. '
+      else
+        'invalid data.'
+      end
+
+      error << string
     end
   end
 end

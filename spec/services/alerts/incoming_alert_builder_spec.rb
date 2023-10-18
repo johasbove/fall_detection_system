@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Alerts::IncomingAlertParser do
+RSpec.describe Alerts::IncomingAlertBuilder do
   let!(:device) { create(:device) }
   let!(:alert_params) { {
     "status": "received",
@@ -13,10 +13,6 @@ RSpec.describe Alerts::IncomingAlertParser do
   subject { described_class.new(alert_params).build_alert }
 
   context 'when receiving valid alert params' do
-    it 'creates an alert with the information received' do
-      expect { subject }.to change { Alert.count }.by(1)
-    end
-
     it 'does not return an error message' do
       response = subject
 
@@ -30,7 +26,7 @@ RSpec.describe Alerts::IncomingAlertParser do
 
       response = subject
 
-      expect(response[:error]).to be_present
+      expect(response[:error]).to include('Missing SIM sid.')
     end
   end
 
@@ -40,7 +36,7 @@ RSpec.describe Alerts::IncomingAlertParser do
 
       response = subject
 
-      expect(response[:error]).to be_present
+      expect(response[:error]).to include('Device does not exists.')
     end
   end
 
@@ -50,7 +46,7 @@ RSpec.describe Alerts::IncomingAlertParser do
 
       response = subject
 
-      expect(response[:error]).to be_present
+      expect(response[:error]).to include('Missing content data.')
     end
   end
 
@@ -61,7 +57,7 @@ RSpec.describe Alerts::IncomingAlertParser do
 
       response = subject
 
-      expect(response[:error]).to be_present
+      expect(response[:error]).to include('Invalid content format.')
     end
   end
 end

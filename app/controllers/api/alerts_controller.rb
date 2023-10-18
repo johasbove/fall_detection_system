@@ -1,9 +1,9 @@
-class API::AlertsController < ApplicationController
+class Api::AlertsController < ApplicationController
   def create
-    alert = Alerts::IncomingAlertParser.new(alert_params).build_alert
+    alert = Alerts::IncomingAlertBuilder.new(alert_params.to_h).build_alert
 
     if alert[:error].nil? && alert.save
-      render json: alert
+      render json: { success: true, alert: alert }
     elsif alert[:error]
       render json: { success: false, error: alert[:error] }, status: 400
     else
