@@ -1,7 +1,7 @@
 module Alerts
   class IncomingAlertParser
-    def initializer(alert_params)
-      @alert_params = alert_params
+    def initialize(alert_params)
+      @alert_params = alert_params.with_indifferent_access
       @alert = Alert.new
     end
 
@@ -18,6 +18,7 @@ module Alerts
           device: device
         )
 
+        alert.save!
         alert
       else
         { error: 'invalid data'}
@@ -27,8 +28,9 @@ module Alerts
     private
 
     def is_valid?
-      !alert_params[:sim_sid].nil? &&
-        !alert_params[:content].nil? &&
+      alert_params[:sim_sid].present? &&
+        alert_params[:content].present? &&
+        device_exists? &&
         is_content_valid?
     end
 
@@ -37,8 +39,12 @@ module Alerts
       response[:is_valid]
     end
 
+    def device_exists?
+      !device.nil?
+    end
+
     def device
-      Device.find_by(sim_sid: alert_params[:sim_sid])
+      @device ||= Device.find_by(sim_sid: alert_params[:sim_sid])
     end
 
     def received_at
@@ -46,7 +52,7 @@ module Alerts
     end
 
     def alert_type
-      Alert.alert_type(content_by_field['T'].downcase)
+      content_by_field['T'].downcase
     end
 
     def received_value
@@ -69,8 +75,10 @@ module Alerts
 
       @content_by_field = {}
       raw_content = alert_params[:content]
+      splitted_content = raw_content.split(' ')
+      @content_by_field['initial_word'] = splitted_content[0]
 
-      raw_content.split(' ')[1..].each do |content_string|
+      splitted_content[1..].each do |content_string|
         (key, val) = content_string.split('=')
         @content_by_field[key] = val
       end
