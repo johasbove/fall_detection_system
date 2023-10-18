@@ -34,11 +34,13 @@ brew services start postgresql@13
 
 I think the app should run fine with another PostgreSQL version, in case you have already another version installed.
 
-For starting the app, please run:
+For starting the app, please go to the app's folder and run:
 
 ```
 rails db:create
 rails db:seed
+bundle install
+rails g rspec:install
 rails s
 ```
 
@@ -46,7 +48,7 @@ Which should display a Rails image at <http://127.0.0.1:3000>. If you have probl
 
 The command `rails db:create` creates a PostgreSQL DB named `fall_detection_system_development`.
 
-
+To run all tests, please use the command `bundle exec rspec`.
 
 
 
