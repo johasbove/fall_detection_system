@@ -31,17 +31,11 @@ module Alerts
     end
 
     def is_date_format_valid?
-      begin
-        content[:DT].present? &&
-          DateTime.parse(content[:DT]).class.eql?(DateTime)
-      rescue Date::Error => e
-        false
-      end
+      Dates::Validator.new(content[:DT]).is_valid?
     end
 
     def is_alert_type_valid?
-      content[:T].present? &&
-        Alert::ALERT_TYPES.keys.include?(content[:T].downcase.to_sym)
+      Alert.validate_type(content[:T])
     end
   end
 end

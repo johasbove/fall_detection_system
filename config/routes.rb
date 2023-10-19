@@ -5,6 +5,6 @@ Rails.application.routes.draw do
   # root "articles#index"
 
   namespace :api do
-    resources :alerts, only: :create
+    resources :alerts, only: [:create, :index]
   end
 end
