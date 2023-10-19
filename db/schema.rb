@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_10_17_092654) do
+ActiveRecord::Schema[7.0].define(version: 2023_10_19_191023) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -61,6 +61,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_17_092654) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "messages", force: :cascade do |t|
+    t.bigint "alert_id", null: false
+    t.integer "status"
+    t.bigint "caregiver_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["alert_id"], name: "index_messages_on_alert_id"
+    t.index ["caregiver_id"], name: "index_messages_on_caregiver_id"
+  end
+
   create_table "patients", force: :cascade do |t|
     t.string "first_name"
     t.string "last_name"
@@ -76,5 +86,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_17_092654) do
   add_foreign_key "caregivers", "health_centers"
   add_foreign_key "devices", "health_centers"
   add_foreign_key "devices", "patients"
+  add_foreign_key "messages", "alerts"
+  add_foreign_key "messages", "caregivers"
   add_foreign_key "patients", "health_centers"
 end

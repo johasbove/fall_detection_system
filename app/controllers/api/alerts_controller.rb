@@ -3,6 +3,8 @@ class Api::AlertsController < ApplicationController
     alert = Alerts::IncomingAlertBuilder.new(alert_params.to_h).build_alert
 
     if alert[:error].nil? && alert.save
+      alert.notify_caregiver
+
       render json: {
         success: true,
         alert: alert.as_json(

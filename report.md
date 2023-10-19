@@ -9,8 +9,7 @@
 - Issues I had/what took me longer than expected
 
 
-====
-ideas:
+## Ideas:
 
 - Alerts might need to be filterable by health center, since the information of one center's patients is relevant for the caregivers of that center. Then, it's handy to add a reference number to the health center, so external APIs can use that ID to search for an specific center without having access to internal id information.
 - Caregivers are assumed to be associated to only one Health Center, that could be false in the reality but for now we're not considering shifts (which could also alter the staff's availability for responding alerts) so this assumption seems acceptable as a first approach.
@@ -25,3 +24,22 @@ ideas:
 - Might be a good idea to add some handling of invalid alerts in the alerts' content validator. What I'm thinking is that invalid alerts could be related to problems in the patients' devices, which would be important to notify either to the health centers or to the people responsible for those. Then adding some emailing or other kind of messaging with aggregated failing information might be a good idea. For that we could either save that data until the report is sent or triggering a custom error and track them in our error handling services. Two of these options would be implemented inside of the Alerts::ContentValidator service.
 - Doesn't feel as a good decision to me to filter by exact datetime of the reception of the alert since it seems to be too much precision (maybe for the use case it actually makes sense though).
 For now I'll implement what makes sense to me, which is taking into account a range of 1 minute surrounding the input received for the filter (it could be taken down to the second to make it more restricted).
+
+## Notes on Level 4
+
+Many implementation details were left out in this level. For now, lacking data from the field, I'll go to a simple approach in which I'll notify a caregiver following a queue logic for sending the messages.
+
+This raises the problem:
+- The caregiver might not be available at the time he/she's notified. We can tackle that problem in different ways, some I've thought of:
+  - We need to have a way to know about the caregivers' availability. We could, for example, save the weekly schedules and daily changes on status with a web/phone app that can be used by the health center.
+  - The caregiver could respond the SMS received with the status 'unavailable'. After receiving this response we could reassign the alert to another caregiver. This option raises other complexities, like identifying which alert the response is referring to (for example, might be necessary to mark previous alerts as completed), the key word received is error prone since is just typed manually by the caregiver, when to mark the caregiver as available again.. and I'm sure there's many more haha.
+  - A way to guarantee that the alert is attended and reduce the reaction time to the minimum, we could broadcast the message to all caregivers. But, how can a caregiver notify others he/she will attend an alert? This brings many other implementation details to think about, similar to the previous point. But it could be an implementation similar of a group messaging solution, where is possible to identify the alert they are responding to.
+
+Other implementation notes:
+
+- Sidekiq is the service running the background jobs. It relies on Redis, which (after configuring it to don't pop the job out of the memory until it's completed) is quite reliable in terms of failure of the worker server running the job.
+  Then the failure point would be Redis crashing. For that Redis also provides an option of back up the data in DB, which would prevent loosing the data of unsent messages.
+
+- Note that handling errors during saving the alert is as important as the creation of the caregiver message to guarantee the patient is visited. The execution of the notification happens only after the alert is successfully created.
+
+- Creating a table **messages** that serves as a link between alerts and caregivers (is basically the assignation of caregivers) allows us to validate that two or more caregivers are not assigned to respond the same alert and finally implement a sort of queue by blocking the DB whenever an assignation is being made (I'd need to check better about this correctly implementing a queue for assigning caregivers, I'm not completely sure - it feels it doesn't - :S but is the best approach I can think of right now).
