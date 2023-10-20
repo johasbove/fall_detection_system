@@ -33,6 +33,6 @@ class Alert < ApplicationRecord
   end
 
   def notify_caregiver
-    NotifyCaregiverJob.perform_async(self, caregiver)
+    NotifyCaregiverJob.perform_later(self, caregiver)
   end
 end

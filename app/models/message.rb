@@ -11,4 +11,8 @@ class Message < ApplicationRecord
   enum :status, STATUS
 
   validates :alert_id, uniqueness: { conditions: -> { where.not(status: 'failed') } }
+
+  def self.sms_external_service
+    Messages::ExternalApi::HttpClient
+  end
 end

@@ -1,6 +1,7 @@
 module Messages
-  class ExternalApi::InMemory
+  class ExternalApi::HttpClient
     def self.call(phone, content)
+      # To implement
       { body: { success: true } }
     end
   end
