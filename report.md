@@ -43,3 +43,23 @@ Other implementation notes:
 - Note that handling errors during saving the alert is as important as the creation of the caregiver message to guarantee the patient is visited. The execution of the notification happens only after the alert is successfully created.
 
 - Creating a table **messages** that serves as a link between alerts and caregivers (is basically the assignation of caregivers) allows us to validate that two or more caregivers are not assigned to respond the same alert and finally implement a sort of queue by blocking the DB whenever an assignation is being made (I'd need to check better about this correctly implementing a queue for assigning caregivers, I'm not completely sure - it feels it doesn't - :S but is the best approach I can think of right now).
+
+
+## Level 6: Ideation
+
+How would you solve these issues?
+
+- Caregiver does not receive the SMS or is not near its phone
+Having the message broadcasted would reduce the dependency on any particular caregiver to respond.
+
+Besides that, maybe having a specific device for this kind of messages could also be an option to reduce this problem, I’m thinking of something like doctors’ pagers.
+
+- How does the care giver enters the patient's house?
+An idea is to have the instructions in the **additional information** field, however, it's error prone and could failed in case, for example, the neighbor having the key is not home.
+
+Another idea could be to have lockers, maybe outside the patient house or in the health centers, so that all care givers can have access to the keys when they need it.
+
+Might be even better if the lockers can use a password to open. The password would be then shared only to the caregiver that is attending the alert and then reset afterwards... it'd need to be a very reliable system though.
+
+- What if our system is down? Any ways to limit point of failure?
+Replicas in different server services could help limiting the risk of having our system down. Also the previous discussion regarding Sidekiq and Redis is a way to limit point of failures sending the messages. Another idea might be having an emergency system connecting the patient directly to the caregiver in a more simpler way, with a very simple logic that actives only if needed.
